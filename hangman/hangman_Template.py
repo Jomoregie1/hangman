@@ -1,24 +1,19 @@
-'''
-Make sure you complete all the TODOs in this file.
-The prints have to contain the same text as indicated, don't add any more prints,
-or you will get 0 for this assignment.
-'''
 import random
 
 
 class Hangman:
-    '''
+    """
     A Hangman Game that asks the user for a letter and checks if it is in the word.
     It starts with a default number of lives and a random word from the word_list.
 
-    
+
     Parameters:
     ----------
     word_list: list
         List of words to be used in the game
     num_lives: int
         Number of lives the player has
-    
+
     Attributes:
     ----------
     word: str
@@ -40,20 +35,22 @@ class Hangman:
         Checks if the letter is in the word.
     ask_letter()
         Asks the user for a letter.
-    '''
+    """
 
-    def __init__(self, word_list, num_lives=5):
+    def __init__(self, word_list: list[str], num_lives=5):
         self.word_list = word_list
         self.num_lives = num_lives
         self.word = random.choice(self.word_list)
         self.word_guessed = ['_' for _ in range(len(self.word))]
-        self.guessed_letters = set()
-        self.unique_letters = len(self.word)
-        self.isguesscorrect = False
+
+        # I used a set here instead of a list because it quicker to make comparisons O(1) compared with O(n) for a list.
+        self.list_of_guesses = set()
+        self.num_letters = len(self.word)
+
         print(f"The mistery word has {len(self.word_guessed)} characters.")
         print(self.word_guessed)
 
-    def check_letter(self, letter) -> None:
+    def check_letter(self, letter: str) -> None:
         """
         Checks if the letter is in the word.
         If it is, it replaces the '_' in the word_guessed list with the letter.
@@ -66,21 +63,22 @@ class Hangman:
 
         """
 
+        isGuessCorrect = False
+
         char_list = [char.lower() for char in self.word]
         for i in range(len(char_list)):
-            if char_list[i] == letter.lower():
-                self.word_guessed[i] = letter.lower()
-                self.unique_letters -= 1
-                self.isguesscorrect = True
+            if char_list[i] == letter:
+                self.word_guessed[i] = letter
+                self.num_letters -= 1
+                isGuessCorrect = True
 
-        if not self.isguesscorrect:
+        if not isGuessCorrect:
             self.num_lives -= 1
 
-        self.guessed_letters.add(letter.lower())
-        self.isguesscorrect = False
+        self.list_of_guesses.add(letter)
         print(f"{self.word_guessed} | Current life: {self.num_lives}")
 
-    def ask_letter(self):
+    def ask_letter(self) -> bool:
         """
         Asks the user for a letter and checks two things:
         1. If the letter has already been tried
@@ -88,24 +86,23 @@ class Hangman:
         If it passes both checks, it calls the check_letter method.
         """
 
-        while self.num_lives > 0 and self.unique_letters > 0:
-            letter = input("Enter a letter here: ")
+        while self.num_lives > 0 and self.num_letters > 0:
+            letter = input("Enter a letter here: ").lower()
             if len(letter) != 1 or not letter.isalpha():
-                print("Please, enter just one character.")
-            elif letter in self.guessed_letters:
+                print("Invalid letter. Please, enter a single alphabetical character.")
+            elif letter in self.list_of_guesses:
                 print(f"{letter} was already tried.")
             else:
                 self.check_letter(letter)
 
-        if self.num_lives > 0 and self.unique_letters == 0:
-            self.isguesscorrect = True
+        return self.num_letters == 0
 
 
-def play_game(word_list):
+def play_game(word_list: list[str]) -> None:
     # As an aid, part of the code is already provided:
     game = Hangman(word_list, num_lives=5)
-    game.ask_letter()
-    if game.isguesscorrect:
+    isGameWon = game.ask_letter()
+    if isGameWon:
         print("Congratulations! You Won!")
     else:
         print(f"You Lost! The word was {game.word}")
@@ -114,4 +111,3 @@ def play_game(word_list):
 if __name__ == '__main__':
     word_list = ['apple', 'banana', 'orange', 'pear', 'strawberry', 'watermelon']
     play_game(word_list)
-
