@@ -27,6 +27,8 @@ def ask_for_input():
 		guess = input("Enter a letter here: ")
 		if len(guess) == 1 and guess.isalpha():
 			break
+		else:
+			print(f"{guess} is an invaild value, please try again with a letter.")
 	return guess
 
 
